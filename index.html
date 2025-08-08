@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>안심CARE · 일반구매 / 구독구매 비교 + 상담용 요약 PDF</title>
+<style>
+  :root{
+    --brand:#c40000; --bg:#0a0f1e; --card:#0f172a;
+    --line:#1f2a44; --pill:#0b1220; --muted:#9aa6c0; --radius:14px; --gap:12px;
+  }
+  *{box-sizing:border-box;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;}
+  body{margin:0;background:var(--bg);color:#e7eefb}
+  .wrap{max-width:980px;margin:0 auto;padding:18px}
+  .brandbar{display:flex;gap:12px;margin-bottom:10px;padding:12px;border:1px solid var(--line);
+    border-radius:var(--radius);background:linear-gradient(90deg,rgba(196,0,0,.12),rgba(196,0,0,0))}
+  .logo{display:flex;align-items:center;gap:12px}
+  .logo img{width:44px;height:44px;border-radius:8px;object-fit:cover;display:block}
+  .sub{color:var(--muted);font-size:12px;line-height:1.35}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+  h1{margin:6px 0 4px;font-size:22px}
+  h2{margin:10px 0 4px;font-size:17px}
+  .muted{color:var(--muted);font-size:12px}
+  .badge{padding:8px 10px;border-radius:10px;font-size:12px;border:1px solid var(--line);background:rgba(196,0,0,.12);color:#ffd2d2;cursor:pointer}
+  input,select{width:100%;padding:12px;border-radius:12px;background:var(--pill);border:1px solid var(--line);color:#e7eefb;outline:none}
+  input[type="number"]{text-align:right}
+  input[type="checkbox"]{width:auto;transform:scale(1.1);margin-right:6px}
+  .row{display:grid;grid-template-columns:1fr;gap:var(--gap)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap)}
+  @media(min-width:740px){.row{grid-template-columns:1.2fr 1fr}}
+  .table{width:100%;border-collapse:collapse}
+  .table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px dashed var(--line);font-size:14px}
+  .kpi{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;background:var(--pill);border:1px solid var(--line);border-radius:12px}
+  .highlight{color:#93f1cb;font-weight:700}
+  .pill{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;background:var(--pill);border:1px solid var(--line);color:#aac1e6}
+  .right{text-align:right}
+  .warn{color:#fbbf24;font-size:12px}
+  .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .grow{flex:1}
+
+  /* 인쇄(PDF) 전용 - PDF는 단일 시나리오만 */
+  #printSummary{display:none}
+  @media print{
+    @page{size:A4;margin:14mm}
+    body{background:white;color:#111}
+    .wrap,.card,.brandbar{border:none;background:white}
+    #app{display:none!important}
+    #printSummary{display:block!important}
+    .ps-head{display:flex;align-items:flex-end;gap:10px;margin-bottom:8px}
+    .ps-title{font-weight:800;font-size:18px}
+    .ps-sub{font-size:12px;color:#555}
+    .ps-table{width:100%;border-collapse:collapse;margin-top:8px}
+    .ps-table th,.ps-table td{border:1px solid #ddd;padding:8px;font-size:12px}
+    .ps-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- 상단 -->
+  <div class="brandbar">
+    <div class="logo">
+      <img src="https://play-lh.googleusercontent.com/_uH9WIQdMGBGMoq-IXWmgvGD0AU72NSy3aTWA6FTPCGJwUcv9DRAQjf4HR83gPdvMjY" alt="LOTTE HIMART">
+      <div>
+        <div style="font-weight:800;font-size:18px;">안심CARE</div>
+        <div class="sub">Total home service clean &amp; warranty<br>→하이마트 삼천포점 홈서비스센터<br>제작 : 서비스센터장</div>
+      </div>
+    </div>
+    <div style="margin-left:auto" class="flex">
+      <input id="customer_name" class="grow" placeholder="고객명 입력 (인쇄엔 ‘고객님’ 붙여 표기)" />
+      <button class="badge" onclick="window.print()">상담용 요약 PDF</button>
+    </div>
+  </div>
+
+  <div id="app">
+    <h1>일반구매 / 구독구매 비교</h1>
+
+    <div class="row">
+      <!-- 좌측 입력 -->
+      <div class="card">
+        <h2>구독 조건 선택 비교</h2>
+        <div class="grid-2" style="margin-top:6px">
+          <div>
+            <label>일반 구매가 (원)</label>
+            <input type="number" id="buy_price" value="1390000" min="0">
+            <div class="muted">무상 A/S 보증기간은 <b>1년 고정</b>. (부가세 포함)</div>
+          </div>
+          <div>
+            <label>구독 월요금 (원)</label>
+            <input type="number" id="sub_monthly" value="52300" min="0">
+            <div class="muted">첫 달 결제 <b>5%(최대 50,000원)</b> 청구할인 자동 반영.</div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:12px">
+          <div>
+            <label>구독기간(= A/S 보증)</label>
+            <select id="sub_months">
+              <option value="36" selected>36개월 (3년)</option>
+              <option value="60">60개월 (5년)</option>
+            </select>
+          </div>
+          <div>
+            <label>제휴카드 캐시백</label>
+            <select id="cashback_tier">
+              <option value="0">없음</option>
+              <option value="11000" selected>월 30만원↑ (11,000)</option>
+              <option value="15000">월 70만원↑ (15,000)</option>
+            </select>
+          </div>
+          <div>
+            <label>품목선택</label>
+            <select id="preset">
+              <option value="NONE">선택 없음 (연장보증만)</option>
+              <optgroup label="에어컨">
+                <option value="SET-CLEAN-PAC|156000">스탠드 (156,000)</option>
+                <option value="SET-CLEAN-RAC|101000">벽걸이 (101,000)</option>
+                <option value="SET-CLEAN-2IN1|252000">2IN1 (252,000)</option>
+                <option value="SET-CLEAN-3IN1|338000">3IN1 (338,000)</option>
+              </optgroup>
+              <optgroup label="세탁기">
+                <option value="SET-CLEAN-WM|106000">일반 (106,000)</option>
+                <option value="SET-CLEAN-WM(DRUM)|170000">드럼(일반) (170,000)</option>
+              </optgroup>
+              <optgroup label="건조기/의류관리기">
+                <option value="SET-CLEAN-DRYER(NEW)|92000">건조기 전모델 (92,000)</option>
+                <option value="SET-CLEAN-STEAMCLOSET|68000">의류관리기 전모델 (68,000)</option>
+              </optgroup>
+              <optgroup label="냉장고">
+                <option value="SET-CLEAN-REF|126000">단문형 (126,000)</option>
+                <option value="SET-CLEAN-SBS|164000">양문형 (164,000)</option>
+              </optgroup>
+              <optgroup label="김냉">
+                <option value="SET-CLEAN-KREF(UPDOOR)|99000">뚜껑식 (99,000)</option>
+                <option value="SET-CLEAN-KREF(STAND)|121000">스탠드 (121,000)</option>
+                <option value="SET-CLEAN-KREF(4DOOR)|170000">4도어 (170,000)</option>
+              </optgroup>
+              <optgroup label="식기세척기">
+                <option value="SET-CLEAN-DW|84000">전모델 (84,000)</option>
+              </optgroup>
+            </select>
+            <div class="muted" id="preset_hint">해당 품목을 선택하세요.</div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:12px">
+          <div>
+            <label>클리닝 1회 비용(원)</label>
+            <input type="number" id="val_cleaning" value="80000" min="0">
+            <div class="muted">품목 선택 시 자동 변경됩니다.</div>
+          </div>
+          <div>
+            <label>클리닝 횟수</label>
+            <select id="cleaning_count">
+              <option value="1" selected>최소 1회</option>
+              <option value="2">2회</option>
+              <option value="3">3회</option>
+            </select>
+          </div>
+          <div>
+            <label>연장보증 환산가(원)</label>
+            <input type="number" id="val_warranty" value="50000" min="0">
+            <div class="muted">일반 구매가 기준 자동 계산(수정 가능). ‘선택 없음’ 모드에서만 혜택으로 반영.</div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:12px">
+          <div>
+            <label>부품/소모품 환산가(원)</label>
+            <input type="number" id="val_parts" value="0" min="0">
+          </div>
+          <div>
+            <label>부품/소모품 포함 여부 (구독)</label>
+            <div><input type="checkbox" id="parts_included"><span class="muted">구독 열에서만 선택 가능</span></div>
+          </div>
+          <div>
+            <label>부품/소모품 비고</label>
+            <input type="text" id="parts_note" placeholder="예: 배터리 교체 1회">
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:12px">
+          <div>
+            <label>제품 구매 혜택 → 포인트/캐시백 등 (원)</label>
+            <input type="number" id="benefit_manual" value="0" min="0">
+            <div class="muted">일반/구독 동일 차감. (부가세 포함)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 우측 KPI -->
+      <div class="card">
+        <h2>혜택가 최종 비교👓</h2>
+        <div class="kpi" style="margin-top:8px"><span>일반 구매 총액</span><strong id="kpi_buy">-</strong></div>
+        <div class="kpi"><span>구독결제 최종금액(선택 캐시백 포함)</span><strong id="kpi_final_incl_cb" class="highlight">-</strong></div>
+        <div class="kpi"><span>구독 혜택 적용 후 실질금액</span><strong id="kpi_sub_net" class="highlight">-</strong></div>
+        <p class="muted" style="margin-top:10px">실질금액 = (월요금-캐시백)×기간 − <b>청구할인(최초결제의 5%, 최대 50,000)</b> − (연장보증+클리닝+소모품) − 제품구매혜택</p>
+        <p class="warn" id="warn_none" style="display:none;margin-top:10px">‘선택 없음’ 모드: 연장보증만 혜택으로 반영됩니다.</p>
+      </div>
+    </div>
+
+    <!-- 상세 비교 -->
+    <div class="card">
+      <h2>상세 혜택 비교</h2>
+      <table class="table" id="compare_table" style="margin-top:6px">
+        <thead>
+          <tr><th>항목</th><th>일반 구매</th><th>구독 구매</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>구독구매 최초결제</td><td id="t_buy_price"></td><td id="t_sub_first"></td></tr>
+          <tr><td>월 납입(캐시백 반영)</td><td class="muted">해당 없음</td><td id="t_sub_monthly"></td></tr>
+          <tr><td>총 기간</td><td>일시불/카드사 단기할부</td><td id="t_sub_months"></td></tr>
+          <tr><td>무상 A/S 보증</td><td><b>1년</b> (고정)</td><td id="t_sub_warranty"></td></tr>
+          <tr><td>클리닝</td><td><span class="muted">별도구매</span></td><td id="t_cleaning"></td></tr>
+          <tr><td>부품/소모품</td><td><span class="muted">별도구매</span></td><td id="t_parts"></td></tr>
+          <tr><td>총액</td><td id="t_buy_total"></td><td id="t_sub_total"></td></tr>
+          <tr><td>혜택 환산가</td><td class="muted">-</td><td id="t_benefit_value"></td></tr>
+          <tr><td>제품구매 혜택(수기)</td><td id="t_benefit_manual_buy"></td><td id="t_benefit_manual_sub"></td></tr>
+          <tr><td><b>혜택 적용 후 실질금액</b></td><td id="t_buy_net"></td><td id="t_sub_net" class="highlight"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 카드 사용금액 별 최종 혜택가 비교 (화면에서 유지) -->
+    <div class="card">
+      <h2>카드 사용금액 별 최종 혜택가 비교</h2>
+      <div class="grid-2" style="margin-top:8px">
+        <div>
+          <div class="pill">월 30만원↑ (11,000원 캐시백)</div>
+          <table class="table">
+            <tr><td>월 납입</td><td class="right" id="s30_monthly">-</td></tr>
+            <tr><td>총액(청구할인 반영)</td><td class="right" id="s30_total">-</td></tr>
+            <tr><td>혜택 적용 후 실질금액</td><td class="right" id="s30_net"><b>-</b></td></tr>
+          </table>
+        </div>
+        <div>
+          <div class="pill">월 70만원↑ (15,000원 캐시백)</div>
+          <table class="table">
+            <tr><td>월 납입</td><td class="right" id="s70_monthly">-</td></tr>
+            <tr><td>총액(청구할인 반영)</td><td class="right" id="s70_total">-</td></tr>
+            <tr><td>혜택 적용 후 실질금액</td><td class="right" id="s70_net"><b>-</b></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF(단일 시나리오만) -->
+  <div id="printSummary">
+    <div class="ps-head">
+      <div class="ps-title">구독 구매 견적서</div>
+      <div class="ps-sub" style="margin-left:6px">가전제품 구독 구매 상담 견적 요약</div>
+    </div>
+    <div class="ps-meta">
+      <div><b>상담일자</b> : <span id="ps_date"></span></div>
+      <div><b>고객명</b> : <span id="ps_customer">고객님</span></div>
+      <div><b>매장</b> : 롯데하이마트 삼천포점</div>
+      <div><b>연락처</b> : 055-835-5533</div>
+      <div><b>표시 금액</b> : 부가세 포함</div>
+    </div>
+    <table class="ps-table">
+      <tr><th>품목</th><td id="ps_preset">-</td><th>구독기간</th><td id="ps_months">-</td></tr>
+      <tr><th>일반 구매 총액</th><td id="ps_buy">-</td><th>구독구매 최초 결제 금액</th><td id="ps_sub_firstgross">-</td></tr>
+      <tr><th>구독 총액(사용조건 캐시백 반영)</th><td id="ps_sub">-</td><th>혜택 환산(연장보증/클리닝/소모품)</th><td id="ps_benefit">-</td></tr>
+      <tr><th>최종금액(캐시백+혜택환산)</th><td id="ps_final" colspan="3">-</td></tr>
+      <tr><th>비고</th><td colspan="3">구독기간만큼 보증 연장 / 클리닝·소모품 제공은 품목에 따라 상이합니다.</td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  const fmt = (n)=> (isNaN(n)? "-" : n.toLocaleString('ko-KR')+"원");
+  const monthsToYearsText = (m)=> `${m}개월 (= ${Math.round(m/12)}년)`;
+
+  function calcWarrantyByBuyPrice(price){
+    const tiers = [
+      [150000,4000],[300000,6000],[500000,7000],[750000,10500],[1000000,14000],
+      [1500000,21000],[2000000,28000],[2500000,35000],[3000000,42000],
+      [3500000,49000],[4000000,56000],[10000000,70000],
+    ];
+    for(const [max,fee] of tiers){ if(price<=max) return fee; }
+    return 70000;
+  }
+
+  function applyPreset(){
+    const chosen = document.getElementById('preset').value;
+    const valCleaning = document.getElementById('val_cleaning');
+    const partsIncluded = document.getElementById('parts_included');
+    const warn = document.getElementById('warn_none');
+
+    if(chosen==='NONE'){
+      valCleaning.value = 0;
+      partsIncluded.checked = false;
+      if(warn) warn.style.display = "block";
+    }else{
+      const price = +chosen.split('|')[1];
+      valCleaning.value = price||0;
+      valCleaning.dispatchEvent(new Event('input'));
+      if(warn) warn.style.display = "none";
+    }
+    calc();
+  }
+
+  function calc(){
+    const buyPrice = +document.getElementById('buy_price').value||0;
+    const subMonthly = +document.getElementById('sub_monthly').value||0;
+    const months = +document.getElementById('sub_months').value||0;
+    const cashback = +document.getElementById('cashback_tier').value||0; // 0/11000/15000
+    const cleaningCount = +document.getElementById('cleaning_count').value||0;
+    const valCleaning = +document.getElementById('val_cleaning').value||0;
+    const partsIncluded = document.getElementById('parts_included').checked;
+    const valParts = +document.getElementById('val_parts').value||0;
+    const partsNote = document.getElementById('parts_note').value||"";
+    const preset = document.getElementById('preset').value;
+    const benefitManual = +document.getElementById('benefit_manual').value||0;
+
+    // 연장보증 자동/수동 보호
+    const autoWarranty = calcWarrantyByBuyPrice(buyPrice);
+    const warrantyInput = document.getElementById('val_warranty');
+    if(document.activeElement!==warrantyInput){ warrantyInput.value = autoWarranty; }
+    const valWarranty = +warrantyInput.value||0;
+
+    // 구독 최초 결제, 청구할인
+    const subGross = subMonthly * months;
+    const initDisc = Math.min(Math.round(subGross*0.05), 50000);
+
+    // 선택 캐시백 반영 구독 총액
+    const subMonthlyAfter = Math.max(subMonthly - cashback, 0);
+    const subTotal = subMonthlyAfter * months - initDisc;
+
+    // 혜택 환산(선택없음일 때만 보증)
+    const cleaningTimes = (preset==='NONE'?0:Math.max(cleaningCount,0));
+    const benefitCleaning = (preset==='NONE'?0:(valCleaning*cleaningTimes));
+    const benefitParts = (preset==='NONE'?0:(partsIncluded?valParts:0));
+    const benefitWarranty = (preset==='NONE'?valWarranty:0);
+    const benefitTotal = benefitWarranty + benefitCleaning + benefitParts;
+
+    // KPI/상세
+    const cbSelected = cashback * months;
+    const finalInclCB = subGross - initDisc - benefitManual - cbSelected;
+    const buyNet = buyPrice - benefitManual;
+    const subNet = (subTotal - benefitTotal) - benefitManual;
+
+    document.getElementById('kpi_buy').textContent = fmt(buyPrice);
+    document.getElementById('kpi_final_incl_cb').textContent = fmt(finalInclCB);
+    document.getElementById('kpi_sub_net').textContent = fmt(subNet);
+
+    document.getElementById('t_buy_price').textContent = fmt(buyPrice);
+    document.getElementById('t_sub_first').textContent = fmt(subGross);
+    document.getElementById('t_sub_monthly').textContent = fmt(subMonthlyAfter);
+    document.getElementById('t_sub_months').textContent = monthsToYearsText(months);
+    document.getElementById('t_sub_warranty').textContent = monthsToYearsText(months);
+    document.getElementById('t_cleaning').innerHTML = (preset==='NONE')?"미포함":`${cleaningTimes}회 × ${fmt(valCleaning)} = ${fmt(benefitCleaning)}`;
+    document.getElementById('t_parts').innerHTML = (preset==='NONE')?"미포함":(partsIncluded?`포함 (${partsNote||"소모품"}) · ${fmt(valParts)}`:"미포함");
+    document.getElementById('t_buy_total').textContent = fmt(buyPrice);
+    document.getElementById('t_sub_total').textContent = fmt(subTotal);
+    document.getElementById('t_benefit_value').textContent = fmt(benefitTotal);
+    document.getElementById('t_benefit_manual_buy').textContent = "-"+fmt(benefitManual).replace("원","원");
+    document.getElementById('t_benefit_manual_sub').textContent = "-"+fmt(benefitManual).replace("원","원");
+    document.getElementById('t_buy_net').textContent = fmt(buyNet);
+    document.getElementById('t_sub_net').textContent = fmt(subNet);
+
+    // 화면용: 30만/70만 비교 숫자 채우기
+    const s30Monthly = Math.max(subMonthly - 11000, 0);
+    const s70Monthly = Math.max(subMonthly - 15000, 0);
+    const s30Total = s30Monthly * months - initDisc;
+    const s70Total = s70Monthly * months - initDisc;
+    const s30Net = (s30Total - benefitTotal) - benefitManual;
+    const s70Net = (s70Total - benefitTotal) - benefitManual;
+    document.getElementById('s30_monthly').textContent = fmt(s30Monthly);
+    document.getElementById('s70_monthly').textContent = fmt(s70Monthly);
+    document.getElementById('s30_total').textContent = fmt(s30Total);
+    document.getElementById('s70_total').textContent = fmt(s70Total);
+    document.getElementById('s30_net').textContent = fmt(s30Net);
+    document.getElementById('s70_net').textContent = fmt(s70Net);
+
+    // PDF(단일) 값 주입
+    const presetText = document.getElementById('preset').selectedOptions[0].textContent;
+    document.getElementById('ps_preset').textContent = presetText;
+    document.getElementById('ps_months').textContent = monthsToYearsText(months);
+    document.getElementById('ps_buy').textContent = fmt(buyPrice);
+    document.getElementById('ps_sub_firstgross').textContent = fmt(subGross);
+    document.getElementById('ps_sub').textContent = fmt(subTotal);
+    document.getElementById('ps_benefit').textContent = fmt(benefitTotal);
+    document.getElementById('ps_final').textContent = fmt(finalInclCB - benefitTotal); // 최종금액(캐시백+혜택환산)
+  }
+
+  // 고객명 → “고객님” 붙여서 PDF에 반영 + 날짜
+  function syncPrintMeta(){
+    const raw = document.getElementById('customer_name').value.trim();
+    const name = raw ? (raw + " 고객님") : "고객님";
+    document.getElementById('ps_customer').textContent = name;
+    const d = new Date();
+    const pad = (n)=> String(n).padStart(2,"0");
+    document.getElementById('ps_date').textContent =
+      `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+
+  document.getElementById('preset').addEventListener('change', applyPreset);
+  ['buy_price','sub_monthly','sub_months','cashback_tier','cleaning_count','val_cleaning','parts_included','val_parts','parts_note','val_warranty','benefit_manual','customer_name']
+    .forEach(id => document.getElementById(id).addEventListener('input', ()=>{ syncPrintMeta(); calc(); }));
+
+  // 초기 실행 보장(공란 방지)
+  window.addEventListener('load', ()=>{ syncPrintMeta(); applyPreset(); calc(); });
+</script>
+</body>
+</html>
