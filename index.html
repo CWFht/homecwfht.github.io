@@ -40,7 +40,14 @@
   .grow{flex:1}
 
   /* 입력/선택 ‘핫스팟’ 강조 */
-  .hot label::before{content:"✍️ 입력";margin-right:6px;color:#98f79e}
+  .hot label::before{
+    content:"✍️ 입력";
+    margin-right:6px;
+    color:#98f79e;
+    font-size:12px;           /* ← 글자 크기 축소 */
+    font-weight:700;
+    letter-spacing:0.2px;
+  }
   .hot label{display:flex;justify-content:flex-start;gap:6px;align-items:center;margin-bottom:6px;font-weight:800}
   .hot input,.hot select{
     background:linear-gradient(0deg, var(--hot-bg), var(--pill));
@@ -55,6 +62,9 @@
   select:focus{border-color:var(--hot-border);box-shadow:0 0 0 3px var(--hot-shadow)}
   option{background-color:#0b1220;color:#e7eefb}
   optgroup{color:#aac1e6;background:#0b1220}
+
+  /* 모델명은 항상 대문자 표시 */
+  #model_name{text-transform:uppercase;}
 
   /* 인쇄(PDF) 전용 — 시인성 강화 */
   #printSummary{display:none}
@@ -108,8 +118,8 @@
       </div>
       <div class="hot" style="min-width:220px">
         <label>모델명</label>
-        <input id="model_name" placeholder="예) 오브제…" />
-        <div class="hot-tip">PDF 본문에 큼직하게 표기</div>
+        <input id="model_name" placeholder="예) OBJ1234" />
+        <div class="hot-tip">항상 대문자로 표시됩니다</div>
       </div>
       <button class="badge" onclick="window.print()">상담용 요약 PDF</button>
     </div>
@@ -462,11 +472,12 @@
     set('ps_final', fmt(finalInclCB - benefitTotal));
   }
 
-  // 고객/모델명은 PDF 본문 박스에만 반영
+  // 고객/모델명은 PDF 본문 박스에만 반영 (모델명은 대문자 처리)
   function syncPrintMeta(){
     const rawName = document.getElementById('customer_name')?.value.trim() || "";
+    const rawModel = document.getElementById('model_name')?.value.trim() || "-";
     const name = rawName ? (rawName + " 고객님") : "고객님";
-    const model = document.getElementById('model_name')?.value.trim() || "-";
+    const model = rawModel.toUpperCase();  // ← PDF 값도 대문자 고정
     const d = new Date(); const pad = (n)=> String(n).padStart(2,"0");
     const dateTxt = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     const set = (id, v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
