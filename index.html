@@ -13,101 +13,65 @@
   .highlight{color:#93f1cb;font-weight:700}
   input,select{padding:8px;border-radius:8px;border:1px solid #1f2a44;background:#0b1220;color:#e7eefb;width:100%}
   input:focus,select:focus{outline:2px solid #9bff6a}
-  .btn{padding:10px 14px;border-radius:10px;border:1px solid #2b374f;background:#132235;color:#d8e7ff;cursor:pointer}
-
-  /* ===== 인쇄(PDF) 레이아웃 ===== */
-  #printArea{display:none}
-  @media print{
-    body{background:#fff;color:#111}
-    .wrap{max-width:100%;padding:0}
-    .card{display:none!important}
-    #printArea{display:block}
-    .ps-container{padding:14mm}
-    .ps-title{font-size:28px;font-weight:900;margin:0 0 6px}
-    .ps-sub{font-size:14px;margin:0 0 10px;color:#333}
-    .ps-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
-    .ps-box{border:2px solid #111;border-radius:10px;padding:10px}
-    .ps-box h3{margin:0 0 6px 0;font-size:15px}
-    .ps-box .num{font-size:22px;font-weight:900}
-    .ps-table{width:100%;border-collapse:collapse;margin-top:6px}
-    .ps-table th,.ps-table td{border:1.8px solid #111;padding:8px 10px;font-size:14px}
-    .ps-table th{background:#f3f5fa}
-    .ps-meta{margin-top:8px;font-size:12px;color:#444}
+  @media print {
+    body{background:white;color:#000}
+    .card{page-break-inside:avoid;border:1.5px solid #000;color:#000}
+    th,td{border:1px solid #000}
+    /* 화면용 비교는 출력하지 않음 */
+    #screen_compare{display:none}
+    /* PDF 요약만 출력 */
+    #print_section{display:block}
   }
+  /* PDF 요약은 화면에서는 숨김 */
+  #print_section{display:none}
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <!-- 입력 카드 -->
   <div class="card">
     <h2>입력</h2>
     <label>일반 구매가(원) <input id="buy_price" value="1,390,000"></label><br><br>
     <label>구독 월요금(원) <input id="sub_monthly" value="52,300"></label><br><br>
     <label>구독기간
       <select id="sub_months">
-        <option value="36" selected>36개월</option>
+        <option value="36">36개월</option>
         <option value="60">60개월</option>
       </select>
     </label><br><br>
     <label>제휴카드 캐시백
       <select id="cashback_tier">
         <option value="0">없음</option>
-        <option value="11000" selected>월30만원↑(11,000원)</option>
+        <option value="11000">월30만원↑(11,000원)</option>
         <option value="15000">월70만원↑(15,000원)</option>
       </select>
     </label><br><br>
     <label>부품/소모품 환산가(원) <input id="val_parts" value="0"></label><br>
     <label><input type="checkbox" id="parts_included"> 부품/소모품 포함 여부(구독)</label><br>
     <label>부품/소모품 비고 <input id="parts_note" placeholder="예: 배터리교체"></label>
-    <div style="margin-top:12px;text-align:right"><button class="btn" onclick="window.print()">상담용 요약 PDF</button></div>
   </div>
 
-  <!-- 상세 혜택 비교 (화면) -->
-  <div class="card">
+  <!-- 화면용 상세 혜택 비교 -->
+  <div class="card" id="screen_compare">
     <h2>상세 혜택 비교</h2>
     <table>
       <tr><th>항목</th><th>일반 구매</th><th>구독 구매</th></tr>
       <tr><td>구독구매 최초결제</td><td id="t_buy_price"></td><td id="t_sub_first"></td></tr>
-      <tr><td>월 납입(캐시백 반영)</td><td>해당 없음</td><td id="t_sub_monthly"></td></tr>
-      <tr><td>월 납입 합계</td><td>해당 없음</td><td id="t_sub_monthly_sum"></td></tr>
-      <tr><td>구독기간</td><td>일시불/카드사 단기할부</td><td id="t_months"></td></tr>
       <tr><td>부품/소모품</td><td>별도구매</td><td id="t_parts"></td></tr>
       <tr><td>혜택 환산가</td><td>-</td><td id="t_benefit_value"></td></tr>
       <tr><td>혜택 적용 후 실질금액</td><td id="t_buy_net"></td><td id="t_sub_net" class="highlight"></td></tr>
     </table>
   </div>
 
-  <!-- ===== 인쇄용 PDF(상세혜택 포함) ===== -->
-  <div id="printArea">
-    <div class="ps-container">
-      <div class="ps-title">구독 구매 견적서</div>
-      <div class="ps-sub">가전제품 구독 구매 상담 견적 요약</div>
-
-      <div class="ps-grid">
-        <div class="ps-box">
-          <h3>구독 총액(사용조건 캐시백 반영)</h3>
-          <div class="num" id="ps_sub_total">-</div>
-        </div>
-        <div class="ps-box">
-          <h3>최종금액(캐시백+혜택환산)</h3>
-          <div class="num" id="ps_final">-</div>
-        </div>
-      </div>
-
-      <table class="ps-table">
-        <tr><th style="width:24%">항목</th><th style="width:38%">일반 구매</th><th style="width:38%">구독 구매</th></tr>
-        <tr><td>일반 구매 총액</td><td id="ps_buy_total">-</td><td>구독구매 최초 결제 금액: <span id="ps_sub_first">-</span></td></tr>
-        <tr><td>월 납입(캐시백 반영)</td><td>해당 없음</td><td id="ps_sub_monthly">-</td></tr>
-        <tr><td>월 납입 합계</td><td>해당 없음</td><td id="ps_sub_monthly_sum">-</td></tr>
-        <tr><td>구독기간</td><td>일시불/카드사 단기할부</td><td id="ps_months">-</td></tr>
-        <tr><td>부품/소모품</td><td>별도구매</td><td id="ps_parts">-</td></tr>
-        <tr><td>혜택 환산가</td><td>-</td><td id="ps_benefit">-</td></tr>
-        <tr><td><b>혜택 적용 후 실질금액</b></td><td id="ps_buy_net">-</td><td id="ps_sub_net_bold"><b>-</b></td></tr>
-      </table>
-
-      <div class="ps-meta">※ 모든 금액은 부가세 포함 기준입니다.</div>
-    </div>
+  <!-- PDF 전용 요약 (상세 혜택 포함) -->
+  <div class="card" id="print_section">
+    <h2>상담용 요약 PDF - 상세 혜택 비교 포함</h2>
+    <table>
+      <tr><th>항목</th><th>일반 구매</th><th>구독 구매</th></tr>
+      <tr><td>구독구매 최초결제</td><td id="p_buy_price"></td><td id="p_sub_first"></td></tr>
+      <tr><td>부품/소모품</td><td>별도구매</td><td id="p_parts"></td></tr>
+      <tr><td>혜택 환산가</td><td>-</td><td id="p_benefit_value"></td></tr>
+      <tr><td>혜택 적용 후 실질금액</td><td id="p_buy_net"></td><td id="p_sub_net" class="highlight"></td></tr>
+    </table>
   </div>
 </div>
 
@@ -124,51 +88,38 @@ function calc(){
   const partsIncluded=document.getElementById('parts_included').checked;
   const partsNote=document.getElementById('parts_note').value;
 
-  // 최초결제/청구할인(5%<=50,000)
   const subGross=subMonthly*months;
   const initDisc=Math.min(Math.round(subGross*0.05),50000);
-
-  // 캐시백 반영 월/합계/총액
-  const subMonthlyAfter=Math.max(subMonthly-cashback,0);
+  const subMonthlyAfter=subMonthly-cashback;
   const subMonthlySum=subMonthlyAfter*months;
   const subTotal=subMonthlySum-initDisc;
 
-  // 혜택 환산(소모품만: 체크 시 반영)
   const benefitParts=partsIncluded?valParts:0;
   const benefitTotal=benefitParts;
 
   const subNet=subTotal-benefitTotal;
   const buyNet=buyPrice;
 
-  // ===== 화면 표 채우기 =====
+  const partsText=partsIncluded?`포함 (${partsNote||"소모품"}) · ${fmt(valParts)}`:`미포함 ${valParts?"("+fmt(valParts)+")":""}`;
+
   document.getElementById('t_buy_price').textContent=fmt(buyPrice);
   document.getElementById('t_sub_first').textContent=fmt(subGross);
-  document.getElementById('t_sub_monthly').textContent=fmt(subMonthlyAfter);
-  document.getElementById('t_sub_monthly_sum').textContent=fmt(subMonthlySum);
-  document.getElementById('t_months').textContent=months+"개월";
-  document.getElementById('t_parts').innerHTML=partsIncluded?`포함 (${partsNote||"소모품"}) · ${fmt(valParts)}`:`미포함 ${valParts?"("+fmt(valParts)+")":""}`;
+  document.getElementById('t_parts').innerHTML=partsText;
   document.getElementById('t_benefit_value').textContent=fmt(benefitTotal);
   document.getElementById('t_buy_net').textContent=fmt(buyNet);
   document.getElementById('t_sub_net').textContent=fmt(subNet);
 
-  // ===== PDF 값 채우기 =====
-  const set=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=v;};
-  set('ps_sub_total', fmt(subTotal));
-  set('ps_final', fmt(subTotal-benefitTotal));
-  set('ps_buy_total', fmt(buyPrice));
-  set('ps_sub_first', fmt(subGross));
-  set('ps_sub_monthly', fmt(subMonthlyAfter));
-  set('ps_sub_monthly_sum', fmt(subMonthlySum));
-  set('ps_months', months+"개월");
-  set('ps_parts', partsIncluded?`포함 (${partsNote||"소모품"}) · ${fmt(valParts)}`:`미포함 ${valParts?"("+fmt(valParts)+")":""}`);
-  set('ps_benefit', fmt(benefitTotal));
-  set('ps_buy_net', fmt(buyNet));
-  set('ps_sub_net_bold', fmt(subNet));
+  // PDF section sync
+  document.getElementById('p_buy_price').textContent=fmt(buyPrice);
+  document.getElementById('p_sub_first').textContent=fmt(subGross);
+  document.getElementById('p_parts').innerHTML=partsText;
+  document.getElementById('p_benefit_value').textContent=fmt(benefitTotal);
+  document.getElementById('p_buy_net').textContent=fmt(buyNet);
+  document.getElementById('p_sub_net').textContent=fmt(subNet);
 }
 
-// 이벤트
 ['buy_price','sub_monthly','sub_months','cashback_tier','val_parts','parts_included','parts_note']
-  .forEach(id=>document.getElementById(id).addEventListener('input',calc));
+.forEach(id=>document.getElementById(id).addEventListener('input',calc));
 
 window.addEventListener('load',calc);
 </script>
