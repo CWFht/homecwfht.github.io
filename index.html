@@ -30,21 +30,17 @@
   .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(196,0,0,.12);color:#ffd2d2;cursor:pointer}
   input,select{width:100%;padding:12px;border-radius:12px;background:#0e1628;border:1px solid var(--line);color:#e7eefb;outline:none}
   input[type="checkbox"]{width:auto;transform:scale(1.1);margin-right:6px}
-  /* 초록 하이라이트 인풋 */
   .hot label{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:800}
   .hot label::before{content:"✍️ 입력";color:#98f79e;font-size:12px}
   .hot input,.hot select{background:linear-gradient(0deg,var(--hotbg),#0e1628);border:2px solid var(--hot);box-shadow:0 0 0 3px var(--hotshadow)}
   .hot input:focus,.hot select:focus{box-shadow:0 0 0 4px #7dffb855}
-  /* 드롭다운 가독성 */
   option{background:#0b1220;color:#e7eefb}
   optgroup{color:#aac1e6;background:#0b1220}
-  /* 모델명 대문자 */
   #model_name{text-transform:uppercase;}
-  /* 표 공용 */
   table{width:100%;border-collapse:collapse}
   th,td{border-bottom:1px dashed var(--line);padding:10px 8px;text-align:left;font-size:14px}
 
-  /* 인쇄(PDF) — 화면은 유지, 인쇄때만 요약+상세표 노출 */
+  /* 인쇄(PDF) — 화면 유지, 인쇄때만 요약+상세표 노출 */
   #printSummary{display:none}
   @media print{
     @page{size:A4;margin:12mm}
@@ -73,7 +69,6 @@
 <body>
 <div class="wrap">
 
-  <!-- 상단 브랜드 / 고객·모델 입력 / PDF 버튼 -->
   <div class="brandbar">
     <div class="logo"><img src="https://play-lh.googleusercontent.com/_uH9WIQdMGBGMoq-IXWmgvGD0AU72NSy3aTWA6FTPCGJwUcv9DRAQjf4HR83gPdvMjY" alt="HIMART"></div>
     <div>
@@ -95,12 +90,10 @@
     </div>
   </div>
 
-  <!-- 화면 본문 -->
   <div id="app">
     <h1>일반구매 / 구독구매 비교</h1>
 
     <div class="row">
-      <!-- 좌: 입력 카드 -->
       <div class="card">
         <h2>구독 조건 선택 비교</h2>
 
@@ -211,7 +204,6 @@
         </div>
       </div>
 
-      <!-- 우: KPI 카드 -->
       <div class="card">
         <h2>혜택가 최종 비교👓</h2>
         <div class="kpi" style="margin-top:8px"><span>일반 구매 총액</span><strong id="kpi_buy">-</strong></div>
@@ -221,7 +213,6 @@
       </div>
     </div>
 
-    <!-- 상세 혜택 비교(화면) -->
     <div class="card">
       <h2>상세 혜택 비교</h2>
       <table>
@@ -242,7 +233,6 @@
       </table>
     </div>
 
-    <!-- 카드 사용금액 별 비교(화면 유지) -->
     <div class="card">
       <h2>카드 사용금액 별 최종 혜택가 비교</h2>
       <div class="grid-2" style="margin-top:8px">
@@ -266,7 +256,7 @@
     </div>
   </div>
 
-  <!-- 인쇄(PDF) 전용: KPI + 상세 혜택 비교 표 -->
+  <!-- 인쇄(PDF) 전용 -->
   <div id="printSummary" class="ps-wrap">
     <div class="ps-title">구독 구매 견적서</div>
     <div class="ps-sub">가전제품 구독 구매 상담 견적 요약</div>
@@ -308,40 +298,28 @@
 </div>
 
 <script>
-  // ===== 유틸 =====
-  const parseNum = v => {
-    const n = +String(v).replace(/[^\\d]/g,'');
-    return Number.isFinite(n) ? n : 0;
-  };
+  // 숫자 파서(정규식 **단일** 백슬래시)
+  const parseNum = v => Number(String(v).replace(/[^\d]/g,'')) || 0;
   const fmt      = n => (isNaN(n) ? "-" : n.toLocaleString('ko-KR')+"원");
   const fmtPlain = n => n.toLocaleString('ko-KR');
   const monthsText = m => `${m}개월 (= ${Math.round(m/12)}년)`;
 
-  // 콤마 포맷 보완: 입력 중엔 건드리지 않고, blur 시에만 포맷
+  // 입력 포맷: 입력 중엔 건드리지 않고, blur 때만 콤마
   function attachComma(id){
     const el = document.getElementById(id);
     if(!el) return;
-
     el.addEventListener('focus', ()=>{
-      // 포맷 제거하여 숫자만 남김
       const raw = parseNum(el.value);
       el.value = raw ? String(raw) : "";
     });
-
-    el.addEventListener('input', ()=>{
-      // 입력 중에는 실시간 계산만 (콤마 적용 X)
-      calc();
-    });
-
+    el.addEventListener('input', ()=>{ calc(); });
     el.addEventListener('blur', ()=>{
       const val = parseNum(el.value);
-      if(val){ el.value = fmtPlain(val); }
-      else { el.value = ""; } // 0 강제 세팅 방지
+      el.value = val ? fmtPlain(val) : "";
       calc();
     });
   }
 
-  // 연장보증 표 자동 산정(일반가 기준)
   function warrantyByBuy(price){
     const tiers = [
       [150000,4000],[300000,6000],[500000,7000],[750000,10500],[1000000,14000],
@@ -363,7 +341,6 @@
     calc();
   }
 
-  // ===== 메인 계산 =====
   function calc(){
     const buyPrice   = parseNum(document.getElementById('buy_price').value);
     const subMonthly = parseNum(document.getElementById('sub_monthly').value);
@@ -380,17 +357,17 @@
 
     const benefitManual = parseNum(document.getElementById('benefit_manual').value);
 
-    // 연장보증 자동 (입력 중이 아닐 때 갱신)
+    // 연장보증 자동 업데이트(입력 중이 아닐 때)
     const wEl = document.getElementById('val_warranty');
     const autoW = warrantyByBuy(buyPrice);
     if(document.activeElement!==wEl){ wEl.value = autoW ? fmtPlain(autoW) : ""; }
     const valWarranty = parseNum(wEl.value);
 
-    // 최초 결제 총액 / 5% 청구할인(최대 50,000)
+    // 최초결제 총액 / 첫달 청구할인 5%(최대 50,000)
     const subGross = subMonthly * months;
     const initDisc = Math.min(Math.round(subGross * 0.05), 50000);
 
-    // 캐시백 반영 월납입/합계/총액
+    // 캐시백 반영
     const subMonthlyAfter = Math.max(subMonthly - cashback, 0);
     const subMonthlySum   = subMonthlyAfter * months;
     const subTotal        = subMonthlySum - initDisc;
@@ -414,7 +391,7 @@
     set('kpi_final_incl_cb', fmt(finalInclCB));
     set('kpi_sub_net', fmt(subNet));
 
-    // 화면 상세 테이블
+    // 화면 상세
     set('t_buy_price', fmt(buyPrice));
     set('t_sub_first', fmt(subGross));
     set('t_sub_monthly', fmt(subMonthlyAfter));
@@ -432,14 +409,14 @@
     set('t_benefit_manual_sub', "-"+fmt(benefitManual).replace("원","원"));
     set('t_buy_net', fmt(buyNet)); set('t_sub_net', fmt(subNet));
 
-    // 화면 30/70 비교 (참고용 유지)
+    // 카드 시나리오(참고)
     const s30m = Math.max(subMonthly-11000,0), s70m = Math.max(subMonthly-15000,0);
     const s30t = s30m*months - initDisc, s70t = s70m*months - initDisc;
     const s30n = (s30t - benefitTotal) - benefitManual, s70n = (s70t - benefitTotal) - benefitManual;
     set('s30_monthly', fmt(s30m)); set('s30_total', fmt(s30t)); set('s30_net', fmt(s30n));
     set('s70_monthly', fmt(s70m)); set('s70_total', fmt(s70t)); set('s70_net', fmt(s70n));
 
-    // PDF 값 주입 (선택한 단일 조건만)
+    // PDF 값 주입
     const nameRaw=document.getElementById('customer_name').value.trim();
     const modelRaw=(document.getElementById('model_name').value||"").toUpperCase();
     set('ps_name', nameRaw? nameRaw+" 고객님":"고객님"); set('ps_model', modelRaw||"-");
