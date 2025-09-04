@@ -47,12 +47,12 @@
     gap:6px;
     margin-bottom:6px;
     font-weight:800;
-    word-break:keep-all;
+    word-break:keep-all;     /* 한글 글자 단위 줄바꿈 방지 */
   }
   .hot label .badge{
     color:#98f79e;font-size:12px;
     display:inline-flex;
-    white-space:nowrap;
+    white-space:nowrap;      /* 배지 고정 */
     margin-right:0;
   }
   .hot input,.hot select{background:linear-gradient(0deg,var(--hotbg),#0e1628);border:2px solid var(--hot);box-shadow:0 0 0 3px var(--hotshadow)}
@@ -93,7 +93,7 @@
   .bigbox .num{font-size:26px;font-weight:900}
   .light-select, .light-select option, .light-select optgroup {background:#fff;color:#111;border:1px solid #223150}
 
-  /* ===== 인쇄 기본 (네가 준 원본 그대로 유지) ===== */
+  /* ===== 인쇄 기본 ===== */
   #printSummary{display:none}
   #penaltyPrintSheet{display:none !important} /* 화면에서는 항상 숨김 */
 
@@ -187,47 +187,21 @@
     body.print-screen #penaltyPrintSheet{display:none !important}
   }
 
-
-  /* ===== 모바일 최적화 (요약 고정 해제 + 입력 항상 펼침 + 표 카드형) ===== */
+  /* 모바일 */
   @media (max-width: 880px){
     .wrap{padding:12px}
     h1{font-size:22px}
     h2{font-size:16px}
-
-    .brandbar{padding:12px; gap:10px}
-    .brandbar .muted{display:none}
-
     .row{grid-template-columns:1fr;gap:12px}
-    .grid-3{grid-template-columns:1fr}   /* 모바일 1열 */
+    .grid-3{grid-template-columns:1fr 1fr}
     .grid-2{grid-template-columns:1fr}
     input,select{font-size:17px;padding:13px 12px}
     .kpi{padding:12px}
     th,td{font-size:13px;padding:8px 6px}
     .spend-boxes{grid-template-columns:1fr}
     .spend .big{font-size:24px}
-
-    /* ①②③: 상단 고정 완전 해제 + 1열 */
-    #summary3{
-      position:static; top:auto;
-      grid-template-columns:1fr;
-      gap:8px; margin:6px 0 10px;
-    }
-    .pill{padding:10px 12px}
-
-    /* 상세표 → 카드형(모바일만) */
-    #section-detail{padding:12px}
-    #section-detail table thead{display:none}
-    #section-detail table{border:0}
-    #section-detail tbody tr{
-      display:block;border:1px solid var(--line);background:#0e1628;border-radius:12px;
-      padding:10px 12px;margin:0 0 10px 0;
-    }
-    #section-detail tbody td{display:block;border:0;padding:6px 0;font-size:14px}
-    #section-detail tbody td:first-child{font-weight:900;color:#fff;margin-bottom:4px}
-    #section-detail tbody td:nth-child(2)::before{content:"일반 구매 · ";color:#9aa6c0;font-weight:700}
-    #section-detail tbody td:nth-child(3)::before{content:"구독 구매 · ";color:#9aa6c0;font-weight:700}
+    #summary3{grid-template-columns:1fr}
   }
-
   @media (max-width: 520px){
     .grid-3{grid-template-columns:1fr}
     input,select{font-size:16px}
@@ -280,7 +254,7 @@
     </div>
    
     <div class="row">
-      <!-- 입력카드 (항상 펼침) -->
+      <!-- 입력카드 -->
       <div class="card" aria-label="구독 조건 입력">
         <h2>구독 조건 선택</h2>
 
@@ -398,12 +372,13 @@
         <div class="kpi"><span>총 소유비용<br>(사용금액별 캐시백 포함)</span><strong id="kpi_final_incl_cb" class="highlight">-</strong></div>
         <div class="kpi"><span>케어비용 합산 최종혜택가</span><strong id="kpi_sub_net" class="highlight">-</strong></div>
         <p class="muted" style="margin-top:10px">최종혜택가 = (순 납입 월요금-캐시백)×기간 − <b>청구할인(5%, 최대 50,000)</b> − (연장보증+클리닝+소모품) − 제품구매혜택</p>
-        <br><br>
-        <h2>구독하면 좋은점</h2>
-        <div class="kpi" style="margin-top:8px"><span>🔧<b>불확실한 고장에 대한 걱정없이 구매</b></span></div>
-        <div class="kpi" style="margin-top:8px"><span>✅<b>직접관리가 어려운 가전제품→전문가 케어</b></span></div>
-        <div class="kpi" style="margin-top:8px"><span>🧹<b>매년 오르는 클리닝비용→ 가격상승없이</b></span></div>
-        <div class="kpi" style="margin-top:8px"><span>💸<b>목돈 지출없이 자금운용 가능→월분납</b></span></div>
+<br>
+<br>
+<h2>구독하면 좋은점</h2>
+<div class="kpi" style="margin-top:8px"><span>🔧<b>불확실한 고장에 대한 걱정없이 구매</b></span></div>
+<div class="kpi" style="margin-top:8px"><span>✅<b>직접관리가 어려운 가전제품→전문가 케어</b></span></div>
+<div class="kpi" style="margin-top:8px"><span>🧹<b>매년 오르는 클리닝비용→ 가격상승없이</b></span></div>
+<div class="kpi" style="margin-top:8px"><span>💸<b>목돈 지출없이 자금운용 가능→월분납</b></span></div>
       </div>
     </div>
 
@@ -749,10 +724,11 @@
 
     const set=(id,v)=>{const el=$(id); if(el) el.textContent=v;};
 
-    // ⭐ 3줄 요약
+    // ⭐ 3줄 요약 & CTA
     set('sum_monthly', fmt(subMonthlyAfter));
     set('sum_warranty', monthsText(months));
     set('sum_manage', fmt(benefitTotal));
+    set('cta_monthly', fmt(subMonthlyAfter));
 
     // 화면 KPI
     set('kpi_buy', fmt(buyPrice));
