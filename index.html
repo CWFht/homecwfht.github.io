@@ -70,11 +70,29 @@
   .cta .price{font-size:22px}
 
   /* 월 실적 박스 */
-  .spend-boxes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .spend-boxes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
   .spend{border:2px solid var(--red);background:linear-gradient(180deg,#220000,#0f172a);border-radius:14px;padding:14px}
   .spend h3{margin:0 0 6px;font-size:14px;color:#fff}
   .spend .big{font-size:28px;font-weight:900;color:#fff}
   .spend .desc{margin-top:6px;font-size:12px;color:#fff}
+
+
+  /* 선택 캐시백 결과 안내 */
+  #section-card-check{border:2px solid #385a9d}
+  .selected-card-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:12px;align-items:stretch}
+  .selected-card-hero{border:1px solid var(--line);background:linear-gradient(180deg,#0e1d3d,#0e1628);border-radius:14px;padding:14px;display:flex;flex-direction:column;justify-content:center;min-height:150px}
+  .selected-card-hero .hero-label{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:6px}
+  .selected-card-hero .hero-title{font-size:28px;font-weight:900;line-height:1.2;color:#93f1cb}
+  .selected-card-hero .hero-sub{font-size:13px;color:#cbd5e1;margin-top:8px;line-height:1.45}
+  .check-kpi{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;background:#081226;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+  .check-kpi strong{font-size:20px;font-weight:900;color:#93f1cb;text-align:right}
+  .tier-guide{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-top:10px}
+  .tier-box{border:1px solid var(--line);background:#0e1628;border-radius:12px;padding:10px;transition:.15s ease}
+  .tier-box b{display:block;font-size:15px;margin-bottom:4px}
+  .tier-box .mini{font-size:12px;color:var(--muted);line-height:1.35}
+  .tier-box.active{border:2px solid var(--hot);box-shadow:0 0 0 3px var(--hotshadow);background:linear-gradient(0deg,var(--hotbg),#0e1628)}
+  @media (max-width:880px){.selected-card-grid{grid-template-columns:1fr}.tier-guide{grid-template-columns:1fr 1fr}}
+  @media (max-width:520px){.tier-guide{grid-template-columns:1fr}}
 
   /* 상세 비교 테두리 */
   #section-detail{border:2px solid var(--blue)}
@@ -318,16 +336,17 @@
           <div class="hot">
             <label for="sub_months"><span class="badge">✍️ 입력</span>구독기간= A/S 보증</label>
             <select id="sub_months">
-              <option value="36" selected>36개월 (3년)</option>
-              <option value="60">60개월 (5년)</option>
+              <option value="36">36개월 (3년)</option>
+              <option value="60" selected>60개월 (5년)</option>
             </select>
           </div>
           <div class="hot">
             <label for="cashback_tier"><span class="badge">✍️입력</span>사용금액별 캐시백</label>
             <select id="cashback_tier">
               <option value="0">없음</option>
-              <option value="11000" selected>월 30만원↑ (11,000)</option>
-              <option value="15000">월 70만원↑ (15,000)</option>
+              <option value="16000" selected>월 30만원↑ (16,000)</option>
+              <option value="19000">월 70만원↑ (19,000)</option>
+              <option value="21000">월 150만원↑ (21,000)</option>
             </select>
           </div>
           <div class="hot">
@@ -430,15 +449,54 @@
       <h2>월 사용 실적별 예상 부담(캐시백 적용)</h2>
       <div class="spend-boxes">
         <div class="spend">
-          <h3>월 30만원 사용 시 (캐시백 11,000)</h3>
+          <h3>월 30만원 사용 시 (캐시백 16,000)</h3>
           <div class="big" id="spend_300">-</div>
-          <div class="desc">현재 월요금에서 11,000원 캐시백(입금) 뒤의 월 부담</div>
+          <div class="desc">현재 월요금에서 16,000원 캐시백(입금) 뒤의 월 부담</div>
         </div>
         <div class="spend">
-          <h3>월 70만원 사용 시 (캐시백 15,000)</h3>
+          <h3>월 70만원 사용 시 (캐시백 19,000)</h3>
           <div class="big" id="spend_700">-</div>
-          <div class="desc">현재 월요금에서 15,000원 캐시백(입금) 뒤의 월 부담</div>
+          <div class="desc">현재 월요금에서 19,000원 캐시백(입금) 뒤의 월 부담</div>
         </div>
+        <div class="spend">
+          <h3>월 150만원 사용 시 (캐시백 21,000)</h3>
+          <div class="big" id="spend_1500">-</div>
+          <div class="desc">현재 월요금에서 21,000원 캐시백(입금) 뒤의 월 부담</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 선택 캐시백 결과 안내 -->
+    <div class="card" id="section-card-check">
+      <h2>선택한 카드 캐시백 기준 결과</h2>
+      <div class="muted" style="margin-bottom:10px">
+        별도 입력 없이 위의 <b>사용금액별 캐시백</b> 선택값을 기준으로 월 부담과 총 캐시백을 바로 보여줍니다.
+      </div>
+
+      <div class="selected-card-grid">
+        <div class="selected-card-hero">
+          <div class="hero-label">현재 선택 구간</div>
+          <div class="hero-title" id="card_selected_tier">-</div>
+          <div class="hero-sub" id="card_selected_hint">상단 캐시백 선택값을 기준으로 계산됩니다.</div>
+        </div>
+
+        <div>
+          <div class="check-kpi"><span>월 캐시백</span><strong id="card_selected_cashback">-</strong></div>
+          <div class="check-kpi"><span>캐시백 반영 월 부담</span><strong id="card_selected_monthly">-</strong></div>
+          <div class="check-kpi"><span>계약기간 총 캐시백</span><strong id="card_selected_total_cb">-</strong></div>
+          <div class="check-kpi"><span>총 소유비용(캐시백 반영)</span><strong id="card_selected_total_cost">-</strong></div>
+        </div>
+      </div>
+
+      <div class="tier-guide" aria-label="카드 캐시백 구간 안내">
+        <div class="tier-box" id="tier_box_0"><b>캐시백 없음</b><div class="mini">카드 실적 부담 없이 기본 월요금 기준</div></div>
+        <div class="tier-box" id="tier_box_16000"><b>30만원↑</b><div class="mini">월 16,000원 캐시백</div></div>
+        <div class="tier-box" id="tier_box_19000"><b>70만원↑</b><div class="mini">월 19,000원 캐시백</div></div>
+        <div class="tier-box" id="tier_box_21000"><b>150만원↑</b><div class="mini">월 21,000원 캐시백</div></div>
+      </div>
+
+      <div class="muted" style="margin-top:8px">
+        상담 멘트: “고객님이 선택하신 카드 사용 구간 기준으로 보면, 실제 월 부담은 <b id="card_selected_talk_monthly">-</b>입니다.”
       </div>
     </div>
 
@@ -482,9 +540,10 @@
     <div class="ps-kpi" style="border:2px solid #111;border-radius:10px;padding:12px"><h3 style="margin:0 0 6px 0;font-size:15px">최종금액(캐시백+관리비 환산)</h3><div class="num" id="ps_final" style="font-size:22px;font-weight:900">-</div></div>
   </div>
 
-  <div class="ps-spend" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 10px">
-    <div class="ps-kpi" style="border:2px solid #111;border-radius:10px;padding:12px"><h3 style="margin:0 0 6px 0;font-size:15px">월 30만원 사용 시</h3><div class="num" id="ps_spend_300" style="font-size:22px;font-weight:900">-</div><div class="muted" style="font-size:12px;color:#555;margin-top:4px">캐시백 11,000 적용</div></div>
-    <div class="ps-kpi" style="border:2px solid #111;border-radius:10px;padding:12px"><h3 style="margin:0 0 6px 0;font-size:15px">월 70만원 사용 시</h3><div class="num" id="ps_spend_700" style="font-size:22px;font-weight:900">-</div><div class="muted" style="font-size:12px;color:#555;margin-top:4px">캐시백 15,000 적용</div></div>
+  <div class="ps-spend" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:6px 0 10px">
+    <div class="ps-kpi" style="border:2px solid #111;border-radius:10px;padding:10px"><h3 style="margin:0 0 6px 0;font-size:14px">월 30만원 사용 시</h3><div class="num" id="ps_spend_300" style="font-size:20px;font-weight:900">-</div><div class="muted" style="font-size:12px;color:#555;margin-top:4px">캐시백 16,000 적용</div></div>
+    <div class="ps-kpi" style="border:2px solid #111;border-radius:10px;padding:10px"><h3 style="margin:0 0 6px 0;font-size:14px">월 70만원 사용 시</h3><div class="num" id="ps_spend_700" style="font-size:20px;font-weight:900">-</div><div class="muted" style="font-size:12px;color:#555;margin-top:4px">캐시백 19,000 적용</div></div>
+    <div class="ps-kpi" style="border:2px solid #111;border-radius:10px;padding:10px"><h3 style="margin:0 0 6px 0;font-size:14px">월 150만원 사용 시</h3><div class="num" id="ps_spend_1500" style="font-size:20px;font-weight:900">-</div><div class="muted" style="font-size:12px;color:#555;margin-top:4px">캐시백 21,000 적용</div></div>
   </div>
 
   <table class="ps-table" style="width:100%;border-collapse:collapse;margin-top:6px">
@@ -750,6 +809,22 @@
     document.title = _oldTitle || document.title;
   });
 
+  const CASHBACK_TIERS = {
+    0:     {condition:'캐시백 없음', short:'없음', min:'-', cashback:0},
+    16000: {condition:'월 30만원 이상', short:'30만원↑', min:'30만원', cashback:16000},
+    19000: {condition:'월 70만원 이상', short:'70만원↑', min:'70만원', cashback:19000},
+    21000: {condition:'월 150만원 이상', short:'150만원↑', min:'150만원', cashback:21000},
+  };
+  function cashbackInfo(value){
+    return CASHBACK_TIERS[value] || CASHBACK_TIERS[0];
+  }
+  function markSelectedTier(value){
+    [0,16000,19000,21000].forEach(v=>{
+      const el=$(`tier_box_${v}`);
+      if(el) el.classList.toggle('active', Number(value)===v);
+    });
+  }
+
   /* ---------- 비교 계산 ---------- */
   function calc(){
     const buyPrice = parseNum($('buy_price').value);
@@ -806,8 +881,20 @@
     set('kpi_sub_net', fmt(subNet));
 
     // 월 실적 박스
-    set('spend_300', fmt(Math.max(subMonthly - 11000, 0)) + ' /월');
-    set('spend_700', fmt(Math.max(subMonthly - 15000, 0)) + ' /월');
+    set('spend_300', fmt(Math.max(subMonthly - 16000, 0)) + ' /월');
+    set('spend_700', fmt(Math.max(subMonthly - 19000, 0)) + ' /월');
+    set('spend_1500', fmt(Math.max(subMonthly - 21000, 0)) + ' /월');
+
+    // 선택한 캐시백 기준 결과 안내
+    const cbInfo = cashbackInfo(cashback);
+    set('card_selected_tier', cbInfo.condition);
+    set('card_selected_hint', cashback ? `${cbInfo.min} 이상 사용 기준 · 월 ${fmt(cashback)} 캐시백 적용` : '카드 실적 부담 없이 기본 월요금 기준입니다.');
+    set('card_selected_cashback', cashback ? fmt(cashback) + ' /월' : '없음');
+    set('card_selected_monthly', fmt(subMonthlyAfter) + ' /월');
+    set('card_selected_total_cb', fmt(cbSelected));
+    set('card_selected_total_cost', fmt(finalInclCB));
+    set('card_selected_talk_monthly', fmt(subMonthlyAfter) + ' /월');
+    markSelectedTier(cashback);
 
     // 상세표
     set('t_buy_price', fmt(buyPrice));
@@ -852,8 +939,9 @@
     set('ps_benefit', fmt(benefitTotal));
     set('ps_buy_net', fmt(buyNet));
     set('ps_sub_net', fmt(subNet));
-    set('ps_spend_300', fmt(Math.max(subMonthly - 11000, 0)) + ' /월');
-    set('ps_spend_700', fmt(Math.max(subMonthly - 15000, 0)) + ' /월');
+    set('ps_spend_300', fmt(Math.max(subMonthly - 16000, 0)) + ' /월');
+    set('ps_spend_700', fmt(Math.max(subMonthly - 19000, 0)) + ' /월');
+    set('ps_spend_1500', fmt(Math.max(subMonthly - 21000, 0)) + ' /월');
   }
 
   // 저장/복원
@@ -875,8 +963,16 @@
         const el=$(id); if(!el || !(id in data)) continue;
         if(el.type==='checkbox') el.checked=!!data[id]; else el.value=data[id];
       }
+      // 60개월을 새 기본값으로 적용: 기존 저장값이 36개월로 남아 있는 경우에도 최초 1회만 60개월로 전환
+      if(!data.default_sub_months_60_applied && $('sub_months')){
+        $('sub_months').value = '60';
+        data.sub_months = '60';
+        data.default_sub_months_60_applied = true;
+        localStorage.setItem('ansimcare_v2', JSON.stringify(data));
+      }
     }catch(e){}
   }
+
 
   /* ---------- 위약금 계산 ---------- */
   function rateByUsed(used, contract){
@@ -981,7 +1077,6 @@
   $('btnPenaltyOpen').addEventListener('click', ()=>{ $('penaltyModal').classList.add('open'); setTimeout(calcPenalty,0); });
   $('btnPenaltyClose').addEventListener('click', ()=> $('penaltyModal').classList.remove('open'));
   $('btnPenaltyQuickPrint').addEventListener('click', fillAndPrintPenaltySheet);
-
   // 초기 로드
   window.addEventListener('load', ()=>{ restoreAll(); applyPreset(); calc(); calcPenalty(); });
 </script>
